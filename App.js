@@ -12,15 +12,15 @@ import {
 } from 'react-native';
 
 let contactList = [
-  { name: 'Sérgio',   key: '960123421', favorite: true  },
-  { name: 'Anacleto', key: '917209418', favorite: false },
-  { name: 'Silvia',   key: '937902446', favorite: false },
-  { name: 'Pedro',    key: '935728834', favorite: false },
-  { name: 'Anabela',  key: '929452367', favorite: false },
-  { name: 'Carlos',   key: '962372354', favorite: false },
-  { name: 'Amélie',   key: '933001478', favorite: true  },
-  { name: 'Elisa',    key: '919710387', favorite: false },
-  { name: 'José',     key: '967190363', favorite: false },
+  { name: 'Sérgio',   key: '150123421', favorite: true  },
+  { name: 'Anacleto', key: '517209418', favorite: false },
+  { name: 'Silvia',   key: '267902446', favorite: false },
+  { name: 'Pedro',    key: '775728834', favorite: false },
+  { name: 'Anabela',  key: '629452367', favorite: false },
+  { name: 'Carlos',   key: '822372354', favorite: false },
+  { name: 'Amélie',   key: '483001478', favorite: true  },
+  { name: 'Elisa',    key: '119710387', favorite: false },
+  { name: 'José',     key: '087190363', favorite: false },
 ];
 
 class ContactRow extends React.Component {
