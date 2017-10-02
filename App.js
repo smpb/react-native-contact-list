@@ -1,15 +1,15 @@
 'use strict'
 
 import React from 'react';
-import { 
-  NavigatorIOS,
-  TabBarIOS,
-  StatusBar,
-  StyleSheet,
-  Text, 
+
+import {
+  Text,
   View,
-  FlatList,
+  StatusBar,
+  Platform,
 } from 'react-native';
+import { List, ListItem, Icon } from 'react-native-elements'
+import { TabNavigator } from 'react-navigation';
 
 let contactList = [
   { name: 'Sérgio',   key: '150123421', favorite: true  },
@@ -23,101 +23,94 @@ let contactList = [
   { name: 'José',     key: '087190363', favorite: false },
 ];
 
-class ContactRow extends React.Component {
-  render () {
-    let info = this.props.info;
-    let onlyFavorites = this.props.onlyFavorites;
-
-    if (onlyFavorites && (! info.favorite)) return null;
-
-    return (
-      <View style={styles.itemView}>
-        <Text style={styles.itemName}>{info.name}</Text>
-        <Text style={styles.itemKey}> {info.key.match(/\w{3}/g).join(' ')}</Text>
-      </View>
-    );
-  }
-}
-
-class ContactList extends React.Component {
-  render () {
-    let onlyFavorites = (this.props.onlyFavorites || false);
-
-    return (
-      <View style={styles.pane}>
-        <FlatList
-          data = {contactList}
-
-          renderItem = { ({item}) => <ContactRow info={item} onlyFavorites={ onlyFavorites } /> }
-        />
-      </View>
-    );
-  }
-}
+const ACTIVE_TAB_COLOR = '#007aff';
+const STATUSBAR_HEIGHT = Platform.OS === 'ios' ? 20 : StatusBar.currentHeight;
 
 class ContactsScreen extends React.Component {
+  static navigationOptions = {
+    tabBarLabel: 'Home',
+    tabBarIcon: ({ tintColor }) => (
+      <Icon
+        name='ios-contacts'
+        type='ionicon'
+        color={tintColor}
+      />
+    ),
+  };
+
   render() {
-    return ( <ContactList /> );
+    return (
+      <List containerStyle={{marginBottom: 20}}>
+        {
+          contactList.map((l, i) => (
+            <ListItem
+              key={i}
+              title={l.name}
+              subtitle={l.key}
+              leftIcon={{name: 'person'}}
+            />
+          ))
+        }
+      </List>
+    );
   }
 }
 
 class FavoritesScreen extends React.Component {
-  render() {
-    return ( <ContactList onlyFavorites={true} /> );
-  }
-}
-
-export default class App extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {selectedTab: 'tabContacts'};
-  }
-
-  setTab(tabId) { this.setState({selectedTab: tabId}); }
+  static navigationOptions = {
+    tabBarLabel: 'Home',
+    tabBarIcon: ({ tintColor }) => (
+      <Icon
+        name='ios-star-outline'
+        type='ionicon'
+        color={tintColor}
+      />
+    ),
+  };
 
   render() {
-
     return (
-      <View style={{ flex : 1 }}>
-        <StatusBar barStyle="dark-content" />
-        <TabBarIOS>
-          <TabBarIOS.Item 
-            systemIcon="contacts"
-            selected={this.state.selectedTab === 'tabContacts'}
-            onPress={() => this.setTab('tabContacts')}
-          >
-            <NavigatorIOS translucent={false} style={{ flex : 1 }} initialRoute={{ title: 'Contacts', component: ContactsScreen }} />
-          </TabBarIOS.Item>
-          <TabBarIOS.Item
-            systemIcon="favorites"
-            selected={this.state.selectedTab === 'tabFavorites'}
-            onPress={() => this.setTab('tabFavorites')}
-          >
-            <NavigatorIOS translucent={false} style={{ flex : 1 }} initialRoute={{ title: 'Favorites', component: FavoritesScreen }} />
-          </TabBarIOS.Item>
-        </TabBarIOS>
-      </View>
+      <List containerStyle={{marginBottom: 20}}>
+        {
+          contactList.filter(l => l.favorite ).map((l, i) => (
+            <ListItem
+              key={i}
+              title={l.name}
+              subtitle={l.key}
+              leftIcon={{name: 'person'}}
+            />
+          ))
+        }
+      </List>
     );
   }
 }
 
-const styles = StyleSheet.create({
-  pane: {
-      flex: 1,
-      padding: 0,
-      backgroundColor: '#ddd',
+const Nav = TabNavigator(
+  {
+    Contacts: {
+      screen: ContactsScreen,
+    },
+    Favorites: {
+      screen: FavoritesScreen,
+    },
   },
-  itemView : {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    padding: 10,
-    paddingTop: 15,
-    paddingBottom: 15,
-    borderColor: '#ccc',
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    backgroundColor: '#fff',
-  },
-  itemName : { fontWeight: 'bold', fontSize: 18, },
-  itemKey :  { fontWeight: '100', fontSize: 12, paddingTop: 5, },
-});
+  {
+    tabBarPosition: 'bottom',
+    animationEnabled: true,
+    tabBarOptions: {
+      activeTintColor: ACTIVE_TAB_COLOR,
+    },
+  }
+);
 
+export default class App extends React.Component {
+  render() {
+    return (
+      <View style={{ flex : 1, paddingTop: STATUSBAR_HEIGHT, }}>
+        <StatusBar translucent={false} barStyle="dark-content" />
+        <Nav />
+      </View>
+    );
+  }
+}
