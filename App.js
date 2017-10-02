@@ -3,6 +3,7 @@
 import React from 'react';
 
 import {
+  Alert,
   Text,
   View,
   ScrollView,
@@ -10,7 +11,7 @@ import {
   Platform,
 } from 'react-native';
 import { Header, List, ListItem, Icon } from 'react-native-elements'
-import { TabNavigator } from 'react-navigation';
+import { StackNavigator, TabNavigator } from 'react-navigation';
 
 let contactList = [
   { name: 'Sérgio',   key: '150123421', favorite: true  },
@@ -32,27 +33,15 @@ const ACTIVE_TAB_COLOR = '#007aff';
 const STATUSBAR_HEIGHT = Platform.OS === 'ios' ? 20 : StatusBar.currentHeight;
 
 var _sort = (a, b) => { return (a.name > b.name) ? 1 : ((a.name < b.name) ? -1 : 0); };
+var _details = (i) => { Alert.alert('Details', i.name + ' : ' + i.key) };
+
 
 class ContactsScreen extends React.Component {
-  static navigationOptions = {
-    tabBarLabel: 'Home',
-    tabBarIcon: ({ tintColor }) => (
-      <Icon
-        name='ios-contacts'
-        type='ionicon'
-        color={tintColor}
-      />
-    ),
-  };
 
   render() {
     return (
-      <ScrollView>
-        <Header
-          centerComponent={{ text: 'CONTACTS', style: { fontWeight: 'bold', color: '#000' } }}
-          backgroundColor='#fff'
-        />
-        <List containerStyle={{marginTop: 70}}>
+      <ScrollView style={{marginTop: -20}}>
+        <List>
           {
             contactList.sort(_sort).map((l, i) => (
               <ListItem
@@ -60,6 +49,13 @@ class ContactsScreen extends React.Component {
                 title={l.name}
                 subtitle={l.key}
                 leftIcon={{name: 'person'}}
+                rightIcon={
+                  <Icon
+                    name='ios-information-circle-outline'
+                    type='ionicon'
+                    onPress={() => { _details(l) }}
+                  />
+                }
               />
             ))
           }
@@ -69,26 +65,21 @@ class ContactsScreen extends React.Component {
   }
 }
 
+const ContactsNav = StackNavigator({
+  CNav: {
+    screen: ContactsScreen,
+    navigationOptions: ({ navigation }) => ({
+      title: 'CONTACTS',
+    }),
+  },
+});
+
 class FavoritesScreen extends React.Component {
-  static navigationOptions = {
-    tabBarLabel: 'Home',
-    tabBarIcon: ({ tintColor }) => (
-      <Icon
-        name='ios-star-outline'
-        type='ionicon'
-        color={tintColor}
-      />
-    ),
-  };
 
   render() {
     return (
-      <ScrollView>
-        <Header
-          centerComponent={{ text: 'FAVORITES', style: { fontWeight: 'bold', color: '#000' } }}
-          backgroundColor='#fff'
-        />
-        <List containerStyle={{marginTop: 70}}>
+      <ScrollView style={{marginTop: -20}}>
+        <List>
           {
             contactList.sort().filter(l => l.favorite).map((l, i) => (
               <ListItem
@@ -96,6 +87,13 @@ class FavoritesScreen extends React.Component {
                 title={l.name}
                 subtitle={l.key}
                 leftIcon={{name: 'person'}}
+                rightIcon={
+                  <Icon
+                    name='ios-information-circle-outline'
+                    type='ionicon'
+                    onPress={() => { _details(l) }}
+                  />
+                }
               />
             ))
           }
@@ -105,13 +103,41 @@ class FavoritesScreen extends React.Component {
   }
 }
 
-const Nav = TabNavigator(
+const FavoritesNav = StackNavigator({
+  FNav: {
+    screen: FavoritesScreen,
+    navigationOptions: ({ navigation }) => ({
+      title: 'FAVORITES',
+    }),
+  },
+});
+
+const App = TabNavigator(
   {
     Contacts: {
-      screen: ContactsScreen,
+      screen: ContactsNav,
+      navigationOptions: {
+        tabBarLabel: 'Contacts',
+        tabBarIcon: ({ tintColor }) => (
+          <Icon
+            name='ios-contacts'
+            type='ionicon'
+            color={tintColor}
+          />
+        ),
+      }
     },
     Favorites: {
-      screen: FavoritesScreen,
+      screen: FavoritesNav,
+      navigationOptions: {
+        tabBarIcon: ({ tintColor }) => (
+          <Icon
+            name='ios-star-outline'
+            type='ionicon'
+            color={tintColor}
+          />
+        ),
+      },
     },
   },
   {
@@ -123,13 +149,4 @@ const Nav = TabNavigator(
   }
 );
 
-export default class App extends React.Component {
-  render() {
-    return (
-      <View style={{ flex : 1 }}>
-        <Nav />
-      </View>
-    );
-  }
-}
-
+export default App;
